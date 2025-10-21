@@ -1,0 +1,2065 @@
+{
+    "name": "Sales Order Processing",
+    "flow": [
+        {
+            "id": 2,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 3349838,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": -1427,
+                    "y": -276
+                },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "data": {
+                                "editable": "true"
+                            },
+                            "label": "Sales Order Processing"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "value",
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 19,
+            "module": "json:ParseJSON",
+            "version": 1,
+            "parameters": {
+                "type": ""
+            },
+            "mapper": {
+                "json": "{{2.value}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": -1091,
+                    "y": -273
+                },
+                "restore": {
+                    "parameters": {
+                        "type": {
+                            "label": "Choose a data structure"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "udt",
+                        "label": "Data structure"
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "json",
+                        "type": "text",
+                        "label": "JSON string",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 27,
+            "module": "builtin:BasicFeeder",
+            "version": 1,
+            "parameters": {},
+            "mapper": {
+                "array": "{{19.items}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": -759,
+                    "y": -271
+                },
+                "restore": {
+                    "expect": {
+                        "array": {
+                            "mode": "edit"
+                        }
+                    }
+                },
+                "expect": [
+                    {
+                        "mode": "edit",
+                        "name": "array",
+                        "spec": [],
+                        "type": "array",
+                        "label": "Array"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 31,
+            "module": "datastore:SearchRecord",
+            "version": 1,
+            "parameters": {
+                "limit": null,
+                "datastore": 121797,
+                "continueWhenNoRes": false
+            },
+            "mapper": {
+                "sort": [],
+                "filter": [
+                    [
+                        {
+                            "a": "Product Name",
+                            "b": "{{27.productName}}",
+                            "o": "text:equal"
+                        }
+                    ]
+                ],
+                "mappAbleLimit": ""
+            },
+            "metadata": {
+                "designer": {
+                    "x": -459,
+                    "y": -271
+                },
+                "restore": {
+                    "parameters": {
+                        "datastore": {
+                            "label": "Sales Stock Keeping"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "datastore",
+                        "type": "datastore",
+                        "label": "Data store",
+                        "required": true
+                    },
+                    {
+                        "name": "continueWhenNoRes",
+                        "type": "boolean",
+                        "label": "Continue the execution of the route even if the module returns no results"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "uinteger",
+                        "label": "Limit"
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "filter",
+                        "type": "filter",
+                        "label": "Filter",
+                        "options": "rpc://datastore/1.12.1/RpcGetUDTKeys",
+                        "required": true
+                    },
+                    {
+                        "name": "sort",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "select",
+                                "label": "Key",
+                                "dynamic": true,
+                                "options": [],
+                                "required": true
+                            },
+                            {
+                                "name": "order",
+                                "type": "select",
+                                "label": "Order",
+                                "options": [
+                                    {
+                                        "label": "Ascending",
+                                        "value": 1
+                                    },
+                                    {
+                                        "label": "Descending",
+                                        "value": -1
+                                    }
+                                ],
+                                "required": true
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Sort"
+                    },
+                    {
+                        "name": "mappAbleLimit",
+                        "type": "uinteger",
+                        "label": "Mappable Limit"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "__IMTLENGTH__",
+                        "type": "uinteger",
+                        "label": "Total number of bundles"
+                    },
+                    {
+                        "name": "__IMTINDEX__",
+                        "type": "uinteger",
+                        "label": "Bundle order position"
+                    },
+                    {
+                        "name": "key",
+                        "type": "text",
+                        "label": "Key"
+                    },
+                    {
+                        "name": "data",
+                        "spec": [
+                            {
+                                "help": "",
+                                "name": "Product Name",
+                                "type": "text",
+                                "label": null,
+                                "default": null,
+                                "required": false,
+                                "multiline": false
+                            },
+                            {
+                                "help": "",
+                                "name": "Product ID",
+                                "type": "number",
+                                "label": null,
+                                "default": null,
+                                "required": false
+                            },
+                            {
+                                "help": "",
+                                "name": "Unit Price",
+                                "type": "number",
+                                "label": null,
+                                "default": null,
+                                "required": false
+                            },
+                            {
+                                "help": "",
+                                "name": "In Stock",
+                                "type": "number",
+                                "label": null,
+                                "default": null,
+                                "required": false
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Record"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 20,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": -180,
+                    "y": -275
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 32,
+                            "module": "google-email:ActionSendEmail",
+                            "version": 2,
+                            "parameters": {
+                                "account": 10569124
+                            },
+                            "filter": {
+                                "name": "Ordered Quantity Check",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{19.items[].quantity}}",
+                                            "b": "{{31.data.`In Stock`}}",
+                                            "o": "number:greater"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "cc": [],
+                                "to": [
+                                    "cartoonwise.solomon81@gmail.com",
+                                    "nnamanisolomonblessing@outlook.com"
+                                ],
+                                "bcc": [],
+                                "from": "",
+                                "html": "<!doctype html>\r\n<html lang=\"en\">\r\n<head>\r\n  <meta charset=\"UTF-8\">\r\n  <title>Stock Quantity Alert</title>\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n  <style>\r\n    body {\r\n      font-family: Arial, sans-serif;\r\n      background-color: #f5f7fa;\r\n      margin: 0;\r\n      padding: 0;\r\n      color: #333;\r\n    }\r\n    .container {\r\n      max-width: 600px;\r\n      margin: 40px auto;\r\n      background: #ffffff;\r\n      border-radius: 8px;\r\n      box-shadow: 0 2px 8px rgba(0,0,0,0.1);\r\n      padding: 25px 30px;\r\n    }\r\n    .alert {\r\n      background-color: #fff4e5;\r\n      border-left: 5px solid #ff9800;\r\n      color: #b36b00;\r\n      padding: 10px 15px;\r\n      font-weight: bold;\r\n      margin-bottom: 20px;\r\n    }\r\n    .footer {\r\n      margin-top: 20px;\r\n      font-size: 13px;\r\n      color: #666;\r\n      text-align: center;\r\n    }\r\n  </style>\r\n</head>\r\n<body>\r\n  <div class=\"container\">\r\n    <div class=\"alert\">\r\n      ⚠️ Order Quantity Exceeds Available Stock\r\n    </div>\r\n\r\n    <p><strong>Item:</strong> {{31.data.`Product Name`}}</p>\r\n    <p><strong>Quantity Ordered:</strong> {{19.items[].quantity}}</p>\r\n    <p><strong>Quantity in Stock:</strong> {{31.data.`In Stock`}}</p>\r\n\r\n    <p>\r\n      The quantity requested exceeds the available stock. Please review and adjust the order quantity or initiate a restock to fulfill the order completely.\r\n    </p>\r\n\r\n    <p class=\"footer\">\r\n      This is an automated notification — please take action accordingly.\r\n    </p>\r\n  </div>\r\n</body>\r\n</html>\r\n",
+                                "subject": "{{19.items[].productName}}: Maxed Out Order",
+                                "attachments": []
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 20,
+                                    "y": -846,
+                                    "name": "Send Email to Inventory Unit and Accounting Unit"
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "cc": {
+                                            "mode": "chose"
+                                        },
+                                        "to": {
+                                            "mode": "chose",
+                                            "items": [
+                                                null,
+                                                null
+                                            ]
+                                        },
+                                        "bcc": {
+                                            "mode": "chose"
+                                        },
+                                        "attachments": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "account": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "google-restricted"
+                                            },
+                                            "label": "My Google Restricted connection (nnamanisolomonblessing@gmail.com)"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "account",
+                                        "type": "account:google-restricted",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "from",
+                                        "type": "text",
+                                        "label": "From"
+                                    },
+                                    {
+                                        "name": "to",
+                                        "spec": {
+                                            "name": "value",
+                                            "type": "email",
+                                            "label": "Email address",
+                                            "required": true
+                                        },
+                                        "type": "array",
+                                        "label": "To",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "subject",
+                                        "type": "text",
+                                        "label": "Subject"
+                                    },
+                                    {
+                                        "name": "html",
+                                        "type": "text",
+                                        "label": "Content"
+                                    },
+                                    {
+                                        "name": "attachments",
+                                        "spec": [
+                                            {
+                                                "name": "fileName",
+                                                "type": "filename",
+                                                "label": "File name",
+                                                "required": true,
+                                                "semantic": "file:name"
+                                            },
+                                            {
+                                                "name": "data",
+                                                "type": "buffer",
+                                                "label": "Data",
+                                                "required": true,
+                                                "semantic": "file:data"
+                                            },
+                                            {
+                                                "name": "cid",
+                                                "type": "text",
+                                                "label": "Content-ID"
+                                            }
+                                        ],
+                                        "type": "array",
+                                        "label": "Attachments"
+                                    },
+                                    {
+                                        "name": "cc",
+                                        "spec": {
+                                            "name": "value",
+                                            "type": "email",
+                                            "label": "Email address"
+                                        },
+                                        "type": "array",
+                                        "label": "Copy recipient"
+                                    },
+                                    {
+                                        "name": "bcc",
+                                        "spec": {
+                                            "name": "value",
+                                            "type": "email",
+                                            "label": "Email address"
+                                        },
+                                        "type": "array",
+                                        "label": "Blind copy recipient"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 22,
+                            "module": "google-sheets:addRow",
+                            "version": 2,
+                            "metadata": {
+                                "designer": {
+                                    "x": 515,
+                                    "y": -913,
+                                    "name": "Update the Pending Orders Sheet"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 21,
+                            "module": "google-email:ActionSendEmail",
+                            "version": 2,
+                            "parameters": {
+                                "account": 10569124
+                            },
+                            "filter": {
+                                "name": "Check if Stocks are less than 10",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{31.data.`In Stock`}}",
+                                            "b": "10",
+                                            "o": "number:lessorequal"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "cc": [],
+                                "to": [
+                                    "cartoonwise.solomon81@gmail.com"
+                                ],
+                                "bcc": [],
+                                "from": "",
+                                "html": "<!doctype html>\r\n<html lang=\"en\">\r\n<head>\r\n  <meta charset=\"UTF-8\">\r\n  <title>Stock Alert: Item Needs Restocking</title>\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n  <style>\r\n    body {\r\n      font-family: Arial, sans-serif;\r\n      background-color: #f4f6f8;\r\n      color: #333333;\r\n      margin: 0;\r\n      padding: 0;\r\n    }\r\n    .container {\r\n      max-width: 600px;\r\n      margin: 40px auto;\r\n      background: #ffffff;\r\n      border-radius: 8px;\r\n      box-shadow: 0 2px 8px rgba(0,0,0,0.1);\r\n      padding: 20px 30px;\r\n    }\r\n    .alert {\r\n      background-color: #ffe4e4;\r\n      color: #b00020;\r\n      border-left: 5px solid #b00020;\r\n      padding: 10px 15px;\r\n      margin-bottom: 20px;\r\n      font-weight: bold;\r\n    }\r\n    .footer {\r\n      margin-top: 20px;\r\n      font-size: 13px;\r\n      color: #555555;\r\n      text-align: center;\r\n    }\r\n  </style>\r\n</head>\r\n<body>\r\n  <div class=\"container\">\r\n    <div class=\"alert\">\r\n      ⚠️ Out of Stock Alert\r\n    </div>\r\n\r\n    <p><strong>Item:</strong> {{31.data.`Product Name`}}</p>\r\n    <p>This item is currently <span style=\"color:#b00020; font-weight:bold;\">out of stock</span> and needs to be restocked immediately.</p>\r\n\r\n    <p>Please review inventory levels and initiate a restock order as soon as possible to prevent shortages.</p>\r\n\r\n    <p class=\"footer\">This is an automated notification. No reply is necessary.</p>\r\n  </div>\r\n</body>\r\n</html>\r\n",
+                                "subject": "{{31.data.`Product Name`}}: Restock Alert",
+                                "attachments": []
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 347,
+                                    "y": -533,
+                                    "name": "Send Email to Inventory Unit"
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "cc": {
+                                            "mode": "chose"
+                                        },
+                                        "to": {
+                                            "mode": "chose",
+                                            "items": [
+                                                null
+                                            ],
+                                            "collapsed": true
+                                        },
+                                        "bcc": {
+                                            "mode": "chose"
+                                        },
+                                        "attachments": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "account": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "google-restricted"
+                                            },
+                                            "label": "My Google Restricted connection (nnamanisolomonblessing@gmail.com)"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "account",
+                                        "type": "account:google-restricted",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "from",
+                                        "type": "text",
+                                        "label": "From"
+                                    },
+                                    {
+                                        "name": "to",
+                                        "spec": {
+                                            "name": "value",
+                                            "type": "email",
+                                            "label": "Email address",
+                                            "required": true
+                                        },
+                                        "type": "array",
+                                        "label": "To",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "subject",
+                                        "type": "text",
+                                        "label": "Subject"
+                                    },
+                                    {
+                                        "name": "html",
+                                        "type": "text",
+                                        "label": "Content"
+                                    },
+                                    {
+                                        "name": "attachments",
+                                        "spec": [
+                                            {
+                                                "name": "fileName",
+                                                "type": "filename",
+                                                "label": "File name",
+                                                "required": true,
+                                                "semantic": "file:name"
+                                            },
+                                            {
+                                                "name": "data",
+                                                "type": "buffer",
+                                                "label": "Data",
+                                                "required": true,
+                                                "semantic": "file:data"
+                                            },
+                                            {
+                                                "name": "cid",
+                                                "type": "text",
+                                                "label": "Content-ID"
+                                            }
+                                        ],
+                                        "type": "array",
+                                        "label": "Attachments"
+                                    },
+                                    {
+                                        "name": "cc",
+                                        "spec": {
+                                            "name": "value",
+                                            "type": "email",
+                                            "label": "Email address"
+                                        },
+                                        "type": "array",
+                                        "label": "Copy recipient"
+                                    },
+                                    {
+                                        "name": "bcc",
+                                        "spec": {
+                                            "name": "value",
+                                            "type": "email",
+                                            "label": "Email address"
+                                        },
+                                        "type": "array",
+                                        "label": "Blind copy recipient"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 33,
+                            "module": "builtin:BasicAggregator",
+                            "version": 1,
+                            "parameters": {
+                                "feeder": 27
+                            },
+                            "filter": {
+                                "name": "All Orders Check out",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{19.items[].quantity}}",
+                                            "b": "{{31.data.`In Stock`}}",
+                                            "o": "number:lessorequal"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "size": "{{27.size}}",
+                                "price": "{{27.price}}",
+                                "quantity": "{{27.quantity}}",
+                                "productId": "{{27.productId}}",
+                                "productName": "{{27.productName}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 120,
+                                    "y": 25
+                                },
+                                "restore": {
+                                    "extra": {
+                                        "feeder": {
+                                            "label": "Iterator [27]"
+                                        },
+                                        "target": {
+                                            "label": "Custom"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "id": 26,
+                            "module": "google-docs:createADocumentFromTemplate",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 10551068
+                            },
+                            "mapper": {
+                                "from": "drive",
+                                "name": "{{19.customer.name}} Order Reciept",
+                                "select": "dropdown",
+                                "document": "/1CkJ-pQ8yK-YnGOPWiPEy-48vKABJA5R4PgSUFx8iVaw",
+                                "folderId": "/17QfY_0KgTG6ZgG0The5xGqZiMDJFHmDX/1lGSKClQUVW1kgc0f5kKBkR7a5fJyOoX6",
+                                "requests": {
+                                    "Date": "{{formatDate(19.orderDate; \"MM/DD/YYYY\")}}",
+                                    "Item 1": "{{33.array[1].productName}}",
+                                    "Item 2": "{{33.array[2].productName}}",
+                                    "Item 3": "{{33.array[3].productName}}",
+                                    "Item 4": "{{33.array[4].productName}}",
+                                    "Item 5": "{{33.array[5].productName}}",
+                                    "Item 6": "{{33.array[6].productName}}",
+                                    "size 1": "{{33.array[1].size}}",
+                                    "size 2": "{{33.array[2].size}}",
+                                    "size 3": "{{33.array[3].size}}",
+                                    "size 4": "{{33.array[4].size}}",
+                                    "size 5": "{{33.array[5].size}}",
+                                    "size 6": "{{33.array[6].size}}",
+                                    "Address": "{{19.customer.address}}",
+                                    "Exp. Date": "{{formatDate(addDays(19.orderDate; 5); \"MM/DD/YYYY\")}}",
+                                    "quantity 1": "{{33.array[1].quantity}}",
+                                    "quantity 2": "{{33.array[2].quantity}}",
+                                    "quantity 3": "{{33.array[3].quantity}}",
+                                    "quantity 4": "{{33.array[4].quantity}}",
+                                    "quantity 5": "{{33.array[5].quantity}}",
+                                    "quantity 6": "{{33.array[6].quantity}}",
+                                    "Grand Total": "{{19.total}}",
+                                    "unit price 1": "{{33.array[1].price}}",
+                                    "unit price 2": "{{33.array[2].price}}",
+                                    "unit price 3": "{{33.array[3].price}}",
+                                    "unit price 4": "{{33.array[4].price}}",
+                                    "unit price 5": "{{33.array[5].price}}",
+                                    "unit price 6": "{{33.array[6].price}}",
+                                    "Customer Name": "{{19.customer.name}}",
+                                    "total price 1": "{{ifempty(33.array[1].price * 33.array[1].quantity; ignore)}}",
+                                    "total price 2": "{{ifempty(33.array[2].price * 33.array[2].quantity; ignore)}}",
+                                    "total price 3": "{{ifempty(33.array[3].price * 33.array[3].quantity; ignore)}}",
+                                    "total price 4": "{{ifempty(33.array[4].price * 33.array[4].quantity; ignore)}}",
+                                    "total price 5": "{{ifempty(33.array[5].price * 33.array[5].quantity; ignore)}}",
+                                    "total price 6": "{{ifempty(33.array[6].price * 33.array[6].quantity; ignore)}}"
+                                },
+                                "destination": "drive"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 487,
+                                    "y": 26,
+                                    "name": "Generate Invoice from Template"
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "from": {
+                                            "label": "My Drive"
+                                        },
+                                        "select": {
+                                            "label": "By Dropdown"
+                                        },
+                                        "document": {
+                                            "path": [
+                                                "Copy of Fashion Maine: Sales Order"
+                                            ]
+                                        },
+                                        "folderId": {
+                                            "mode": "chose",
+                                            "path": [
+                                                "Make Workflow",
+                                                "Customer Receipts"
+                                            ]
+                                        },
+                                        "destination": {
+                                            "label": "My Drive"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "google"
+                                            },
+                                            "label": "My Google connection (nnamanisolomonblessing@gmail.com)"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:google",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "select",
+                                        "type": "select",
+                                        "label": "Create a Document from a Template",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "map",
+                                                "dropdown"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "name",
+                                        "type": "text",
+                                        "label": "Title",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "destination",
+                                        "type": "select",
+                                        "label": "New Drive Location",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "drive",
+                                                "share",
+                                                "team"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "from",
+                                        "type": "select",
+                                        "label": "Choose a Drive",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "drive",
+                                                "share",
+                                                "team"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "document",
+                                        "type": "file",
+                                        "label": "Document ID",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "requests",
+                                        "spec": [
+                                            {
+                                                "name": "Customer Name",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Address",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Date",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Exp. Date",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Item 1",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "size 1",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "quantity 1",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "unit price 1",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "total price 1",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Item 2",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "size 2",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "quantity 2",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "unit price 2",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "total price 2",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Item 3",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "size 3",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "quantity 3",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "unit price 3",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "total price 3",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Item 4",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "size 4",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "quantity 4",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "unit price 4",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "total price 4",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Item 5",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "size 5",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "quantity 5",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "unit price 5",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "total price 5",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Item 6",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "size 6",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "quantity 6",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "unit price 6",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "total price 6",
+                                                "type": "any"
+                                            },
+                                            {
+                                                "name": "Grand Total",
+                                                "type": "any"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Values"
+                                    },
+                                    {
+                                        "name": "folderId",
+                                        "type": "folder",
+                                        "label": "New Document's Location",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 34,
+                            "module": "builtin:BasicRouter",
+                            "version": 1,
+                            "mapper": null,
+                            "metadata": {
+                                "designer": {
+                                    "x": 760,
+                                    "y": 26
+                                }
+                            },
+                            "routes": [
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 36,
+                                            "module": "builtin:BasicFeeder",
+                                            "version": 1,
+                                            "parameters": {},
+                                            "mapper": {
+                                                "array": "{{33.array}}"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1060,
+                                                    "y": -424
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "array": {
+                                                            "mode": "edit"
+                                                        }
+                                                    }
+                                                },
+                                                "expect": [
+                                                    {
+                                                        "mode": "edit",
+                                                        "name": "array",
+                                                        "spec": [],
+                                                        "type": "array",
+                                                        "label": "Array"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "id": 37,
+                                            "module": "datastore:SearchRecord",
+                                            "version": 1,
+                                            "parameters": {
+                                                "limit": null,
+                                                "datastore": 121797,
+                                                "continueWhenNoRes": false
+                                            },
+                                            "mapper": {
+                                                "sort": [],
+                                                "filter": [
+                                                    [
+                                                        {
+                                                            "a": "Product Name",
+                                                            "b": "{{36.productName}}",
+                                                            "o": "text:equal"
+                                                        }
+                                                    ]
+                                                ],
+                                                "mappAbleLimit": ""
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1279,
+                                                    "y": -492
+                                                },
+                                                "restore": {
+                                                    "parameters": {
+                                                        "datastore": {
+                                                            "label": "Sales Stock Keeping"
+                                                        }
+                                                    }
+                                                },
+                                                "parameters": [
+                                                    {
+                                                        "name": "datastore",
+                                                        "type": "datastore",
+                                                        "label": "Data store",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "continueWhenNoRes",
+                                                        "type": "boolean",
+                                                        "label": "Continue the execution of the route even if the module returns no results"
+                                                    },
+                                                    {
+                                                        "name": "limit",
+                                                        "type": "uinteger",
+                                                        "label": "Limit"
+                                                    }
+                                                ],
+                                                "expect": [
+                                                    {
+                                                        "name": "filter",
+                                                        "type": "filter",
+                                                        "label": "Filter",
+                                                        "options": "rpc://datastore/1.12.1/RpcGetUDTKeys",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "sort",
+                                                        "spec": [
+                                                            {
+                                                                "name": "key",
+                                                                "type": "select",
+                                                                "label": "Key",
+                                                                "dynamic": true,
+                                                                "options": [],
+                                                                "required": true
+                                                            },
+                                                            {
+                                                                "name": "order",
+                                                                "type": "select",
+                                                                "label": "Order",
+                                                                "options": [
+                                                                    {
+                                                                        "label": "Ascending",
+                                                                        "value": 1
+                                                                    },
+                                                                    {
+                                                                        "label": "Descending",
+                                                                        "value": -1
+                                                                    }
+                                                                ],
+                                                                "required": true
+                                                            }
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Sort"
+                                                    },
+                                                    {
+                                                        "name": "mappAbleLimit",
+                                                        "type": "uinteger",
+                                                        "label": "Mappable Limit"
+                                                    }
+                                                ],
+                                                "interface": [
+                                                    {
+                                                        "name": "__IMTLENGTH__",
+                                                        "type": "uinteger",
+                                                        "label": "Total number of bundles"
+                                                    },
+                                                    {
+                                                        "name": "__IMTINDEX__",
+                                                        "type": "uinteger",
+                                                        "label": "Bundle order position"
+                                                    },
+                                                    {
+                                                        "name": "key",
+                                                        "type": "text",
+                                                        "label": "Key"
+                                                    },
+                                                    {
+                                                        "name": "data",
+                                                        "spec": [
+                                                            {
+                                                                "help": "",
+                                                                "name": "Product Name",
+                                                                "type": "text",
+                                                                "label": null,
+                                                                "default": null,
+                                                                "required": false,
+                                                                "multiline": false
+                                                            },
+                                                            {
+                                                                "help": "",
+                                                                "name": "Product ID",
+                                                                "type": "number",
+                                                                "label": null,
+                                                                "default": null,
+                                                                "required": false
+                                                            },
+                                                            {
+                                                                "help": "",
+                                                                "name": "Unit Price",
+                                                                "type": "number",
+                                                                "label": null,
+                                                                "default": null,
+                                                                "required": false
+                                                            },
+                                                            {
+                                                                "help": "",
+                                                                "name": "In Stock",
+                                                                "type": "number",
+                                                                "label": null,
+                                                                "default": null,
+                                                                "required": false
+                                                            }
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Record"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "id": 38,
+                                            "module": "datastore:UpdateRecord",
+                                            "version": 1,
+                                            "parameters": {
+                                                "datastore": 121797
+                                            },
+                                            "mapper": {
+                                                "key": "{{37.key}}",
+                                                "data": {
+                                                    "In Stock": "{{37.data.`In Stock` - 36.quantity}}",
+                                                    "Product ID": "",
+                                                    "Unit Price": "",
+                                                    "Product Name": ""
+                                                },
+                                                "upsert": true,
+                                                "overwriteArrays": false
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1651,
+                                                    "y": -466,
+                                                    "name": "Update Inventory After Order"
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "upsert": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "overwriteArrays": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "datastore": {
+                                                            "label": "Sales Stock Keeping"
+                                                        }
+                                                    }
+                                                },
+                                                "parameters": [
+                                                    {
+                                                        "name": "datastore",
+                                                        "type": "datastore",
+                                                        "label": "Data store",
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "expect": [
+                                                    {
+                                                        "name": "key",
+                                                        "type": "text",
+                                                        "label": "Key",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "upsert",
+                                                        "type": "boolean",
+                                                        "label": "Insert missing record",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "overwriteArrays",
+                                                        "type": "boolean",
+                                                        "label": "Overwrite an existing array in the record",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "data",
+                                                        "spec": [
+                                                            {
+                                                                "name": "Product Name",
+                                                                "type": "text",
+                                                                "label": null
+                                                            },
+                                                            {
+                                                                "name": "Product ID",
+                                                                "type": "number",
+                                                                "label": null
+                                                            },
+                                                            {
+                                                                "name": "Unit Price",
+                                                                "type": "number",
+                                                                "label": null
+                                                            },
+                                                            {
+                                                                "name": "In Stock",
+                                                                "type": "number",
+                                                                "label": null
+                                                            }
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Record"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 41,
+                                            "module": "google-drive:getAFile",
+                                            "version": 4,
+                                            "parameters": {
+                                                "__IMTCONN__": 10593855
+                                            },
+                                            "mapper": {
+                                                "file": "{{26.id}}",
+                                                "select": "map",
+                                                "formatDrawings": "image/jpeg",
+                                                "formatDocuments": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                "formatSpreadsheets": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                                "formatPresentations": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1060,
+                                                    "y": -124
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "select": {
+                                                            "label": "Enter manually"
+                                                        },
+                                                        "formatDrawings": {
+                                                            "label": "JPEG"
+                                                        },
+                                                        "formatDocuments": {
+                                                            "label": "MS Word Document"
+                                                        },
+                                                        "formatSpreadsheets": {
+                                                            "label": "MS Excel"
+                                                        },
+                                                        "formatPresentations": {
+                                                            "label": "MS PowerPoint"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "google-restricted"
+                                                            },
+                                                            "label": "My Google Restricted connection (nnamanisolomonblessing@gmail.com)"
+                                                        }
+                                                    }
+                                                },
+                                                "parameters": [
+                                                    {
+                                                        "name": "__IMTCONN__",
+                                                        "type": "account:google-restricted",
+                                                        "label": "Connection",
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "expect": [
+                                                    {
+                                                        "type": "hidden"
+                                                    },
+                                                    {
+                                                        "name": "select",
+                                                        "type": "select",
+                                                        "label": "Enter a File ID",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "enum": [
+                                                                "map",
+                                                                "value"
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "formatDocuments",
+                                                        "type": "select",
+                                                        "label": "Convert Google Documents Files to Format",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "enum": [
+                                                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                                "application/pdf",
+                                                                "application/vnd.oasis.opendocument.text",
+                                                                "text/html",
+                                                                "text/plain",
+                                                                "application/rtf",
+                                                                "text/markdown"
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "formatSpreadsheets",
+                                                        "type": "select",
+                                                        "label": "Convert Google Spreadsheets Files to Format",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "enum": [
+                                                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                                                "application/x-vnd.oasis.opendocument.spreadsheet",
+                                                                "application/pdf",
+                                                                "text/csv"
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "formatPresentations",
+                                                        "type": "select",
+                                                        "label": "Convert Google Slides Files to Format",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "enum": [
+                                                                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                                                                "application/pdf"
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "formatDrawings",
+                                                        "type": "select",
+                                                        "label": "Convert Google Drawings Files to Format",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "enum": [
+                                                                "image/jpeg",
+                                                                "image/png",
+                                                                "image/svg+xml",
+                                                                "application/pdf"
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "file",
+                                                        "type": "text",
+                                                        "label": "File ID",
+                                                        "required": true
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "id": 42,
+                                            "module": "pdf-co:AnythingToPDF",
+                                            "version": 1,
+                                            "parameters": {
+                                                "__IMTCONN__": 10570687
+                                            },
+                                            "mapper": {
+                                                "async": 15000,
+                                                "export": {
+                                                    "exportType": "downloadFile"
+                                                },
+                                                "import": {
+                                                    "data": "{{41.data}}",
+                                                    "name": "{{41.name}}",
+                                                    "importType": "upload"
+                                                },
+                                                "convert": {
+                                                    "convertType": "fromDocument"
+                                                },
+                                                "expiration": "60"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1368,
+                                                    "y": -173,
+                                                    "name": "Convert Invoice to PDF"
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "async": {
+                                                            "mode": "chose",
+                                                            "label": "Async"
+                                                        },
+                                                        "export": {
+                                                            "nested": {
+                                                                "exportType": {
+                                                                    "label": "Download a File"
+                                                                }
+                                                            }
+                                                        },
+                                                        "import": {
+                                                            "nested": {
+                                                                "importType": {
+                                                                    "label": "Upload a File"
+                                                                }
+                                                            }
+                                                        },
+                                                        "convert": {
+                                                            "nested": {
+                                                                "convertType": {
+                                                                    "label": "Document to PDF"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "pdf-co"
+                                                            },
+                                                            "label": "My PDF.co connection"
+                                                        }
+                                                    }
+                                                },
+                                                "parameters": [
+                                                    {
+                                                        "name": "__IMTCONN__",
+                                                        "type": "account:pdf-co",
+                                                        "label": "Connection",
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "expect": [
+                                                    {
+                                                        "name": "import",
+                                                        "spec": [
+                                                            {
+                                                                "name": "importType",
+                                                                "type": "select",
+                                                                "label": "Input File",
+                                                                "required": true,
+                                                                "validate": {
+                                                                    "enum": [
+                                                                        "upload",
+                                                                        "url"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "data",
+                                                                "type": "buffer",
+                                                                "label": "Data",
+                                                                "required": true
+                                                            },
+                                                            {
+                                                                "name": "name",
+                                                                "type": "text",
+                                                                "label": "Output File Name"
+                                                            }
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Import Options",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "convert",
+                                                        "spec": [
+                                                            {
+                                                                "name": "convertType",
+                                                                "type": "select",
+                                                                "label": "Convert Type",
+                                                                "required": true,
+                                                                "validate": {
+                                                                    "enum": [
+                                                                        "fromEmail",
+                                                                        "fromImage",
+                                                                        "fromDocument",
+                                                                        "fromSpreadsheet"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Convert Options",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "async",
+                                                        "type": "select",
+                                                        "label": "Execution Mode",
+                                                        "validate": {
+                                                            "enum": [
+                                                                false,
+                                                                15000,
+                                                                "asyncCheckLater"
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "profiles",
+                                                        "type": "text",
+                                                        "label": "Profiles"
+                                                    },
+                                                    {
+                                                        "name": "expiration",
+                                                        "type": "number",
+                                                        "label": "Output Links Expiration"
+                                                    },
+                                                    {
+                                                        "name": "export",
+                                                        "spec": [
+                                                            {
+                                                                "name": "exportType",
+                                                                "type": "select",
+                                                                "label": "Export Type",
+                                                                "required": true,
+                                                                "validate": {
+                                                                    "enum": [
+                                                                        "downloadFile",
+                                                                        "inline"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Export options",
+                                                        "required": true
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "id": 43,
+                                            "module": "google-email:ActionSendEmail",
+                                            "version": 2,
+                                            "parameters": {
+                                                "account": 10569124
+                                            },
+                                            "mapper": {
+                                                "cc": [],
+                                                "to": [
+                                                    "{{19.customer.email}}"
+                                                ],
+                                                "bcc": [],
+                                                "from": "",
+                                                "html": "<!doctype html>\r\n<html lang=\"en\">\r\n<head>\r\n  <meta charset=\"UTF-8\">\r\n  <title>Order Confirmation & Invoice</title>\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n  <style>\r\n    body {\r\n      font-family: Arial, sans-serif;\r\n      background-color: #f5f7fa;\r\n      color: #333333;\r\n      margin: 0;\r\n      padding: 0;\r\n    }\r\n    .container {\r\n      max-width: 600px;\r\n      margin: 40px auto;\r\n      background: #ffffff;\r\n      border-radius: 8px;\r\n      box-shadow: 0 2px 8px rgba(0,0,0,0.1);\r\n      padding: 25px 30px;\r\n    }\r\n    h2 {\r\n      color: #2c3e50;\r\n      margin-bottom: 10px;\r\n    }\r\n    .highlight {\r\n      color: #0066cc;\r\n      font-weight: bold;\r\n    }\r\n    .footer {\r\n      margin-top: 25px;\r\n      font-size: 13px;\r\n      color: #666;\r\n      text-align: center;\r\n    }\r\n  </style>\r\n</head>\r\n<body>\r\n  <div class=\"container\">\r\n    <h2>Order Confirmation</h2>\r\n\r\n    <p>Dear <strong>{{19.customer.name}}</strong>,</p>\r\n\r\n    <p>Thank you for your order! We’re pleased to let you know that your order has been successfully received and is now being processed.</p>\r\n\r\n    <p>An invoice for your order has been attached to this email for your reference. Please review the details and keep it for your records.</p>\r\n\r\n    <p>If you have any questions or need further assistance, feel free to reach out to our support team </p>\r\n\r\n    <p>We appreciate your business and look forward to serving you again.</p>\r\n\r\n    <p class=\"footer\">Kind regards,<br>\r\n    <strong>Fashion Maine</strong><br>\r\n    Jacksonville</p>\r\n  </div>\r\n</body>\r\n</html>\r\n",
+                                                "subject": "Order Confirmed 🎉 — Invoice Attached",
+                                                "attachments": [
+                                                    {
+                                                        "cid": "",
+                                                        "data": "{{42.data}}",
+                                                        "fileName": "{{42.name}}"
+                                                    }
+                                                ]
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1668,
+                                                    "y": -173,
+                                                    "name": "Send Customer Invoice"
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "cc": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "to": {
+                                                            "mode": "chose",
+                                                            "items": [
+                                                                null
+                                                            ]
+                                                        },
+                                                        "bcc": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "attachments": {
+                                                            "mode": "chose",
+                                                            "items": [
+                                                                null
+                                                            ]
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "account": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "google-restricted"
+                                                            },
+                                                            "label": "My Google Restricted connection (nnamanisolomonblessing@gmail.com)"
+                                                        }
+                                                    }
+                                                },
+                                                "parameters": [
+                                                    {
+                                                        "name": "account",
+                                                        "type": "account:google-restricted",
+                                                        "label": "Connection",
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "expect": [
+                                                    {
+                                                        "name": "from",
+                                                        "type": "text",
+                                                        "label": "From"
+                                                    },
+                                                    {
+                                                        "name": "to",
+                                                        "spec": {
+                                                            "name": "value",
+                                                            "type": "email",
+                                                            "label": "Email address",
+                                                            "required": true
+                                                        },
+                                                        "type": "array",
+                                                        "label": "To",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "subject",
+                                                        "type": "text",
+                                                        "label": "Subject"
+                                                    },
+                                                    {
+                                                        "name": "html",
+                                                        "type": "text",
+                                                        "label": "Content"
+                                                    },
+                                                    {
+                                                        "name": "attachments",
+                                                        "spec": [
+                                                            {
+                                                                "name": "fileName",
+                                                                "type": "filename",
+                                                                "label": "File name",
+                                                                "required": true,
+                                                                "semantic": "file:name"
+                                                            },
+                                                            {
+                                                                "name": "data",
+                                                                "type": "buffer",
+                                                                "label": "Data",
+                                                                "required": true,
+                                                                "semantic": "file:data"
+                                                            },
+                                                            {
+                                                                "name": "cid",
+                                                                "type": "text",
+                                                                "label": "Content-ID"
+                                                            }
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Attachments"
+                                                    },
+                                                    {
+                                                        "name": "cc",
+                                                        "spec": {
+                                                            "name": "value",
+                                                            "type": "email",
+                                                            "label": "Email address"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Copy recipient"
+                                                    },
+                                                    {
+                                                        "name": "bcc",
+                                                        "spec": {
+                                                            "name": "value",
+                                                            "type": "email",
+                                                            "label": "Email address"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Blind copy recipient"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "id": 46,
+                                            "module": "google-email:ActionSendEmail",
+                                            "version": 2,
+                                            "parameters": {
+                                                "account": 10569124
+                                            },
+                                            "mapper": {
+                                                "cc": [],
+                                                "to": [
+                                                    "nnamanisolomonblessing@outlook.com"
+                                                ],
+                                                "bcc": [],
+                                                "from": "",
+                                                "html": "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n  <meta charset=\"UTF-8\">\r\n  <title>New Order Notification</title>\r\n</head>\r\n<body style=\"font-family: Arial, sans-serif; color: #333333; background-color: #f9f9f9; padding: 20px;\">\r\n  <table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width: 600px; margin: auto; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 8px;\">\r\n    <tr>\r\n      <td style=\"padding: 20px;\">\r\n        <h2 style=\"color: #2c3e50;\">New Order Placed</h2>\r\n        <p>Dear Accounting Team,</p>\r\n\r\n        <p>We would like to inform you that a new order has been placed. Please find the invoice for this order attached to this email.</p>\r\n\r\n        <p><strong>Action Required:</strong> Kindly process the invoice as per standard procedures.</p>\r\n\r\n        <p>If you have any questions or need further details, please let us know.</p>\r\n\r\n        <p>Thank you,<br/>\r\n        [Your Name]<br/>\r\n        [Your Department or Company Name]</p>\r\n      </td>\r\n    </tr>\r\n  </table>\r\n</body>\r\n</html>\r\n​",
+                                                "subject": "Order Confirmation – Invoice Attached for Processing",
+                                                "attachments": [
+                                                    {
+                                                        "cid": "",
+                                                        "data": "{{42.data}}",
+                                                        "fileName": "{{42.name}}"
+                                                    }
+                                                ]
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1968,
+                                                    "y": -173,
+                                                    "name": "Notify Accounting Dept"
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "cc": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "to": {
+                                                            "mode": "chose",
+                                                            "items": [
+                                                                null
+                                                            ]
+                                                        },
+                                                        "bcc": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "attachments": {
+                                                            "mode": "chose",
+                                                            "items": [
+                                                                null
+                                                            ]
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "account": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "google-restricted"
+                                                            },
+                                                            "label": "My Google Restricted connection (nnamanisolomonblessing@gmail.com)"
+                                                        }
+                                                    }
+                                                },
+                                                "parameters": [
+                                                    {
+                                                        "name": "account",
+                                                        "type": "account:google-restricted",
+                                                        "label": "Connection",
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "expect": [
+                                                    {
+                                                        "name": "from",
+                                                        "type": "text",
+                                                        "label": "From"
+                                                    },
+                                                    {
+                                                        "name": "to",
+                                                        "spec": {
+                                                            "name": "value",
+                                                            "type": "email",
+                                                            "label": "Email address",
+                                                            "required": true
+                                                        },
+                                                        "type": "array",
+                                                        "label": "To",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "subject",
+                                                        "type": "text",
+                                                        "label": "Subject"
+                                                    },
+                                                    {
+                                                        "name": "html",
+                                                        "type": "text",
+                                                        "label": "Content"
+                                                    },
+                                                    {
+                                                        "name": "attachments",
+                                                        "spec": [
+                                                            {
+                                                                "name": "fileName",
+                                                                "type": "filename",
+                                                                "label": "File name",
+                                                                "required": true,
+                                                                "semantic": "file:name"
+                                                            },
+                                                            {
+                                                                "name": "data",
+                                                                "type": "buffer",
+                                                                "label": "Data",
+                                                                "required": true,
+                                                                "semantic": "file:data"
+                                                            },
+                                                            {
+                                                                "name": "cid",
+                                                                "type": "text",
+                                                                "label": "Content-ID"
+                                                            }
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Attachments"
+                                                    },
+                                                    {
+                                                        "name": "cc",
+                                                        "spec": {
+                                                            "name": "value",
+                                                            "type": "email",
+                                                            "label": "Email address"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Copy recipient"
+                                                    },
+                                                    {
+                                                        "name": "bcc",
+                                                        "spec": {
+                                                            "name": "value",
+                                                            "type": "email",
+                                                            "label": "Email address"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Blind copy recipient"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 44,
+                                            "module": "slack:CreateMessage",
+                                            "version": 4,
+                                            "parameters": {
+                                                "__IMTCONN__": 9607493
+                                            },
+                                            "mapper": {
+                                                "text": ":shopping_bags: *New Order Received!* :tada:\r\n\r\nHey team! A new customer order just came in. 🧾\r\n\r\n👤 *Customer:* {{19.customer.name}}  \r\n🆔 *Order ID:* {{order_number}}  \r\n📦 *Items:* \n--Product---- Size ---- Quantity\n{{33.array[1].productName}}  {{33.array[1].size}}  {{33.array[1].quantity}}\n\n{{33.array[2].productName}}  {{33.array[2].size}}  {{33.array[2].quantity}}\n\n{{33.array[3].productName}}  {{33.array[3].size}}  {{33.array[3].quantity}}\n\n{{33.array[4].productName}}  {{33.array[4].size}}  {{33.array[4].quantity}}\n\n{{33.array[5].productName}}  {{33.array[5].size}}  {{33.array[5].quantity}}\n\n{{33.array[6].productName}}  {{33.array[6].size}}  {{33.array[6].quantity}}\n\n \r\n💰 *Total:* ${{19.total}}  \r\n📅 *Date:* {{formatDate(19.orderDate; \"MM/DD/YYYY\")}}\n\n📦 Packaging Instructions:\r\n- Use eco-friendly kraft packaging\r\n- Include thank-you card inside each package\r\n- Fold neatly and avoid any plastic wrapping\r\n- Label each package with item type and size\nPlease start processing this order as soon as possible. 🚀  ",
+                                                "parse": false,
+                                                "mrkdwn": true,
+                                                "channel": "C093JDBTP9V",
+                                                "channelType": "public",
+                                                "channelWType": "list"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1236,
+                                                    "y": 90,
+                                                    "name": "Notify Shipping Team"
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "parse": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "mrkdwn": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "channel": {
+                                                            "mode": "chose",
+                                                            "label": "new-updates"
+                                                        },
+                                                        "link_names": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "channelType": {
+                                                            "label": "Public channel"
+                                                        },
+                                                        "channelWType": {
+                                                            "label": "Select from the list"
+                                                        },
+                                                        "unfurl_links": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "unfurl_media": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "reply_broadcast": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "slack2"
+                                                            },
+                                                            "label": "My Slack (user) connection (makeacademyau-ccj8345.slack.com - nnamanisolomonblessin)"
+                                                        }
+                                                    }
+                                                },
+                                                "parameters": [
+                                                    {
+                                                        "name": "__IMTCONN__",
+                                                        "type": "account:slack2,slack3",
+                                                        "label": "Connection",
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "expect": [
+                                                    {
+                                                        "name": "channelWType",
+                                                        "type": "select",
+                                                        "label": "Enter a channel ID or name",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "enum": [
+                                                                "manualy",
+                                                                "list"
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "text",
+                                                        "type": "text",
+                                                        "label": "Text"
+                                                    },
+                                                    {
+                                                        "name": "blocks",
+                                                        "type": "text",
+                                                        "label": "Blocks"
+                                                    },
+                                                    {
+                                                        "name": "thread_ts",
+                                                        "type": "text",
+                                                        "label": "Thread message ID (time stamp)"
+                                                    },
+                                                    {
+                                                        "name": "reply_broadcast",
+                                                        "type": "boolean",
+                                                        "label": "Reply broadcast"
+                                                    },
+                                                    {
+                                                        "name": "link_names",
+                                                        "type": "boolean",
+                                                        "label": "Link names"
+                                                    },
+                                                    {
+                                                        "name": "parse",
+                                                        "type": "boolean",
+                                                        "label": "Parse message text"
+                                                    },
+                                                    {
+                                                        "name": "mrkdwn",
+                                                        "type": "boolean",
+                                                        "label": "Use markdown"
+                                                    },
+                                                    {
+                                                        "name": "unfurl_links",
+                                                        "type": "boolean",
+                                                        "label": "Unfurl primarily text-based content"
+                                                    },
+                                                    {
+                                                        "name": "unfurl_media",
+                                                        "type": "boolean",
+                                                        "label": "Unfurl media content"
+                                                    },
+                                                    {
+                                                        "name": "icon_emoji",
+                                                        "type": "text",
+                                                        "label": "Icon emoji"
+                                                    },
+                                                    {
+                                                        "name": "icon_url",
+                                                        "type": "url",
+                                                        "label": "Icon url"
+                                                    },
+                                                    {
+                                                        "name": "username",
+                                                        "type": "text",
+                                                        "label": "User name"
+                                                    },
+                                                    {
+                                                        "name": "channelType",
+                                                        "type": "select",
+                                                        "label": "Channel type",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "enum": [
+                                                                "public",
+                                                                "private",
+                                                                "im",
+                                                                "mpim"
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "channel",
+                                                        "type": "select",
+                                                        "label": "Public channel",
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "advanced": true
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "eu2.make.com",
+        "notes": []
+    }
+}
