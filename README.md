@@ -11,6 +11,9 @@ The **Sales Order Processing Automation** scenario captures incoming sales order
 
 It is designed for **sales, operations, or fulfillment teams** that need to process high volumes of orders consistently and with full traceability.
 
+![Sales Order Processing](https://github.com/user-attachments/assets/340bd82f-f167-4bbf-a507-e9c824557bad)
+
+
 ---
 
 ## ✨ Key Features
